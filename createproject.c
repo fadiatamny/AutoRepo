@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 
+
 int main(int argc,char* argv[])
 {
     char buff[256] = {0};
@@ -47,21 +48,30 @@ int main(int argc,char* argv[])
         chdir(dist);
         open(".gitignore",O_RDWR|O_CREAT,0700);
         
-        system("code .");
+        pid_t id = fork();
 
-        char* params1[] = {"git", "init"};
-        if (execvp("git",params1))
+        if( id == 0 )
         {
-            printf("execv failed\n");
-            strcpy(dist,ogDist);
-            strcat(dist,"Github/");
-            chdir(dist);
-            char* params2[] = {"rm", "-r",buff};
-            execvp("rm",params2);
+            char* paramsCode[] = {"code-oss", ".", NULL};
+            if (execvp("code-oss",paramsCode))
+            {
+                printf(strerror(errno));
+                printf("execv failed\n");
+            }
         }
-
-        //char* params3[] = {"code", "."};
-        //execvp("code",params3);
+        else
+        {
+            char* params1[] = {"git", "init", NULL};
+            if (execvp("git",params1))
+            {
+                printf("execv failed\n");
+                strcpy(dist,ogDist);
+                strcat(dist,"Github/");
+                chdir(dist);
+                char* params2[] = {"rm", "-r",buff, NULL};
+                execvp("rm",params2);
+            }
+        }
     }
     else
     {
