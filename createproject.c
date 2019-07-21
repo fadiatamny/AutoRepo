@@ -28,8 +28,8 @@ int main(int argc,char* argv[])
         chdir(ogDist);
         if(mkdir("Github", 0700) == -1)
         {
-            printf("error");
-            exit(-1);
+            printf(strerror(errno));
+            return -1;
         }   
         chdir(dist);
     }
@@ -40,23 +40,27 @@ int main(int argc,char* argv[])
     {
         if(mkdir(buff, 0700) == -1)
         {
-            printf("error");
-            exit(-1);
+            printf(strerror(errno));
+            return -1;
         }
         
         strcat(dist,buff);
         chdir(dist);
         open(".gitignore",O_RDWR|O_CREAT,0700);
         
+        int status = 0;
+        pid_t wpid;
+
         pid_t id = fork();
 
-        if( id == 0 )
+        if(id)
         {
+            while ((wpid = wait(&status)) > 0);
+            
             char* paramsCode[] = {"code-oss", ".", NULL};
             if (execvp("code-oss",paramsCode))
             {
                 printf(strerror(errno));
-                printf("execv failed\n");
             }
         }
         else
@@ -64,12 +68,13 @@ int main(int argc,char* argv[])
             char* params1[] = {"git", "init", NULL};
             if (execvp("git",params1))
             {
-                printf("execv failed\n");
+                printf(strerror(errno));
                 strcpy(dist,ogDist);
                 strcat(dist,"Github/");
                 chdir(dist);
                 char* params2[] = {"rm", "-r",buff, NULL};
-                execvp("rm",params2);
+                if(execvp("rm",params2))
+                    printf(strerror(errno));
             }
         }
     }
@@ -78,5 +83,5 @@ int main(int argc,char* argv[])
         printf("File already exists");
     }
     
-    exit(0);
+    return 0;
 }
