@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,19 +8,15 @@
 #include <errno.h>
 #include <sys/wait.h>
 
-
 int main(int argc,char* argv[])
 {
-    char buff[256] = {0};
     char ogDist[256] = "/home/";
     char dist[256] = "";
-    char* params[] = {"cd", "~/"};
 
     strcat(ogDist,getlogin());
     strcat(ogDist,"/Documents/");
     strcpy(dist,ogDist);
     strcat(dist,"Github/");
-    strcpy(buff,argv[1]);
 
     if(chdir(dist)==-1)
     {
@@ -36,15 +31,15 @@ int main(int argc,char* argv[])
 
     struct stat st = {0};
 
-    if (stat(buff, &st) == -1) 
+    if (stat(argv[1], &st) == -1) 
     {
-        if(mkdir(buff, 0700) == -1)
+        if(mkdir(argv[1], 0700) == -1)
         {
             printf(strerror(errno));
             return -1;
         }
         
-        strcat(dist,buff);
+        strcat(dist,argv[1]);
         chdir(dist);
         open(".gitignore",O_RDWR|O_CREAT,0700);
         
@@ -56,7 +51,7 @@ int main(int argc,char* argv[])
         if(id)
         {
             while ((wpid = wait(&status)) > 0);
-            
+
             char* paramsCode[] = {"code-oss", ".", NULL};
             if (execvp("code-oss",paramsCode))
             {
@@ -72,7 +67,7 @@ int main(int argc,char* argv[])
                 strcpy(dist,ogDist);
                 strcat(dist,"Github/");
                 chdir(dist);
-                char* params2[] = {"rm", "-r",buff, NULL};
+                char* params2[] = {"rm", "-r",argv[1], NULL};
                 if(execvp("rm",params2))
                     printf(strerror(errno));
             }
