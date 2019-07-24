@@ -10,5 +10,5 @@ this is a script written in C to run on UNIX/LINUX operating systems to creating
 ##### How to compile ? 
 the compilation steps used here are what i personally use in order to store said application onto my bin folder and use it as a command.
 
-..- gcc createproject.c -o CreateProject 
-..- sudo cp CreateProject /usr/bin
+- gcc createproject.c -o CreateProject 
+- sudo cp CreateProject /usr/bin
